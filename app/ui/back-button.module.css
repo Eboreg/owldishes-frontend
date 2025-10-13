@@ -1,0 +1,7 @@
+.container {
+    position: fixed;
+    top: 0;
+    transition-property: opacity;
+    transition-duration: .25s;
+    background-color: #000a;
+}
