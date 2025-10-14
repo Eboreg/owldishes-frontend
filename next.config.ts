@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     images: {
-        remotePatterns: [{ hostname: "localhost" }],
+        remotePatterns: [{ hostname: "localhost" }, { hostname: "backend.owldishes.huseli.us" }],
     },
 };
 
