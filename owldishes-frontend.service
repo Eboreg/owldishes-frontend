@@ -1,0 +1,9 @@
+[Unit]
+Description=Owl Dishes frontend
+
+[Service]
+WorkingDirectory=/home/pi/owldishes-frontend
+ExecStart=/usr/local/bin/pnpm run start 5001
+
+[Install]
+WantedBy=multi-user.target
