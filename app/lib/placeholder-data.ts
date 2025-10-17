@@ -1,4 +1,4 @@
-import type { Slideshow } from "./definitions";
+import type { Slideshow } from "@/app/lib/definitions";
 
 export const slideshows: Slideshow[] = [
     {

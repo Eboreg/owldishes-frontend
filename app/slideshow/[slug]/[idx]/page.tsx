@@ -17,5 +17,5 @@ export default async function Page(props: Props) {
     const params = await props.params;
     const slideshow = await fetchSlideshow(params.slug);
 
-    return <SlideDisplay idx={parseInt(params.idx)} slideshow={slideshow} />;
+    return <SlideDisplay idx={parseInt(params.idx)} slideshow={slideshow} key="slideshow" />;
 }

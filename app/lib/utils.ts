@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
+import type { WindowSize } from "@/app/lib/definitions";
 
-export function useWindowSize() {
-    const [windowSize, setWindowSize] = useState<{ width?: number; height?: number }>({
-        width: 0,
-        height: 0,
-    });
+export function useWindowSize(): WindowSize {
+    const [windowSize, setWindowSize] = useState<WindowSize>({ width: 0, height: 0 });
 
     useEffect(() => {
         function handleResize() {

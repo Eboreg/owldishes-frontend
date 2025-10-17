@@ -3,47 +3,32 @@
 import clsx from "clsx";
 import Link from "next/link";
 import styles from "@/app/ui/pagination.module.css";
-import { useState } from "react";
-
-function getPaginationIndices(length: number, currentIdx: number, surrounding: number = 3): number[] {
-    let surroundingStart = Math.max(0, currentIdx - surrounding);
-    let surroundingEnd = Math.min(length - 1, currentIdx + surrounding);
-
-    if (surroundingStart < surrounding) {
-        surroundingStart = 0;
-        surroundingEnd = Math.min(length - 1, surrounding * 2 + 2);
-    } else if (surroundingEnd >= length - surrounding) {
-        surroundingStart = Math.max(0, length - surrounding * 2 - 3);
-        surroundingEnd = length - 1;
-    }
-
-    return [
-        ...Array(surroundingEnd + 1 - surroundingStart)
-            .keys()
-            .map((i) => i + surroundingStart),
-    ];
-}
+import React, { useState, useEffect, useRef } from "react";
+import {
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+} from "@heroicons/react/24/outline";
+import { isMouseOver, useMousePosition } from "@/app/contexts/mouse-position-context";
+import type { Rect } from "@/app/lib/definitions";
 
 function PaginationItem({
+    children,
     href,
-    text,
-    isActive,
-    colorClass,
+    disabled = false,
 }: {
-    href?: string;
-    text: string;
-    isActive?: boolean;
-    colorClass?: string;
+    href: string;
+    children: React.ReactNode;
+    disabled?: boolean;
 }) {
-    const classes = clsx(`m-1 h-10 w-10 flex items-center justify-center ${colorClass || "text-gray-400"}`, {
-        "border rounded border-gray-600": isActive,
-    });
+    const classes = clsx("m-1 h-10 w-10 flex items-center justify-center", disabled ? "text-gray-400" : "text-gray-50");
 
-    return isActive || href == undefined ? (
-        <div className={classes}>{text}</div>
+    return disabled ? (
+        <div className={classes}>{children}</div>
     ) : (
         <Link href={href} className={classes}>
-            {text}
+            {children}
         </Link>
     );
 }
@@ -52,23 +37,38 @@ export default function Pagination({
     length,
     currentIdx,
     getHref,
-    getColorClass,
-    surrounding,
     show,
 }: {
     length: number;
     currentIdx: number;
     getHref: (idx: number) => string;
-    getColorClass: (idx: number) => string | undefined;
-    surrounding?: number;
     show: boolean;
 }) {
-    const indices = getPaginationIndices(length, currentIdx, surrounding);
     const [forceShow, setForceShow] = useState<boolean>(false);
+    const { mousePosition } = useMousePosition();
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const rect: Rect = {
+            left: ref.current!.offsetLeft,
+            top: ref.current!.parentElement!.offsetTop,
+            height: ref.current!.offsetHeight,
+            width: ref.current!.offsetWidth,
+        };
+
+        if (isMouseOver(rect, mousePosition)) setForceShow(true);
+    }, [
+        ref.current?.offsetLeft,
+        ref.current?.parentElement?.offsetTop,
+        ref.current?.offsetHeight,
+        ref.current?.offsetWidth,
+        mousePosition,
+    ]);
 
     return (
         <div className={`${styles.container} ${show || forceShow ? "opacity-100" : "opacity-0"}`}>
             <div
+                ref={ref}
                 className={styles.content}
                 onMouseMove={() => {
                     setForceShow(true);
@@ -77,30 +77,21 @@ export default function Pagination({
                     setForceShow(false);
                 }}
             >
-                {indices.includes(1) ? null : (
-                    <PaginationItem href={getHref(0)} text="1" key={0} colorClass={getColorClass(0)} />
-                )}
-                {indices.includes(2) ? null : <PaginationItem text="..." key={1} />}
-                {indices.map((slideIdx) => {
-                    return (
-                        <PaginationItem
-                            href={getHref(slideIdx)}
-                            text={(slideIdx + 1).toString()}
-                            key={slideIdx}
-                            isActive={slideIdx == currentIdx}
-                            colorClass={getColorClass(slideIdx)}
-                        />
-                    );
-                })}
-                {indices.includes(length - 2) ? null : <PaginationItem text="..." key={length - 2} />}
-                {indices.includes(length - 1) ? null : (
-                    <PaginationItem
-                        href={getHref(length - 1)}
-                        text={length.toString()}
-                        key={length - 1}
-                        colorClass={getColorClass(length - 1)}
-                    />
-                )}
+                <PaginationItem href={getHref(0)} disabled={currentIdx == 0}>
+                    <ChevronDoubleLeftIcon className="w-6" />
+                </PaginationItem>
+                <PaginationItem href={getHref(currentIdx - 1)} disabled={currentIdx == 0}>
+                    <ChevronLeftIcon className="w-6" />
+                </PaginationItem>
+                <div className="m-1 h-10 flex items-center justify-center text-lg">
+                    {currentIdx + 1} / {length}
+                </div>
+                <PaginationItem href={getHref(currentIdx + 1)} disabled={currentIdx == length - 1}>
+                    <ChevronRightIcon className="w-6" />
+                </PaginationItem>
+                <PaginationItem href={getHref(length - 1)} disabled={currentIdx == length - 1}>
+                    <ChevronDoubleRightIcon className="w-6" />
+                </PaginationItem>
             </div>
         </div>
     );

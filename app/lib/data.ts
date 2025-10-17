@@ -1,5 +1,5 @@
 import { cache } from "react";
-import type { Slide, Slideshow, SlideshowTable } from "./definitions";
+import type { Slide, Slideshow, SlideshowTable } from "@/app/lib/definitions";
 
 export async function fetchSlideshowTable(): Promise<SlideshowTable> {
     const data = await fetch(process.env.NEXT_PUBLIC_API_ROOT!);

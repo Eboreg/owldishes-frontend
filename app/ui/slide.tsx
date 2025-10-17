@@ -6,7 +6,8 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import { redirect, RedirectType } from "next/navigation";
 import { useWindowSize } from "@/app/lib/utils";
 import Pagination from "@/app/ui/pagination";
-import BackButton from "./back-button";
+import BackButton from "@/app/ui/back-button";
+import { useMousePosition } from "@/app/contexts/mouse-position-context";
 
 function MediaItemDisplay({
     mediaItem,
@@ -50,7 +51,9 @@ export default function SlideDisplay({ slideshow, idx }: { slideshow: Slideshow;
     const [showOverlays, setShowOverlays] = useState<boolean>(false);
     const onTimeout = () => {
         setShowOverlays(false);
+        if (mainRef.current) mainRef.current.style.cursor = "none";
     };
+    const { setMousePosition } = useMousePosition();
     let timeout: NodeJS.Timeout | undefined;
 
     useEffect(() => {
@@ -67,6 +70,7 @@ export default function SlideDisplay({ slideshow, idx }: { slideshow: Slideshow;
         <main
             ref={mainRef}
             tabIndex={-1}
+            className="cursor-none"
             onKeyDown={(e) => {
                 if (e.key === "ArrowRight") {
                     e.preventDefault();
@@ -91,8 +95,10 @@ export default function SlideDisplay({ slideshow, idx }: { slideshow: Slideshow;
                 }
             }}
             onMouseMove={(e) => {
+                setMousePosition({ x: e.clientX, y: e.clientY });
                 setShowOverlays(true);
                 clearTimeout(timeout);
+                if (mainRef.current) mainRef.current.style.cursor = "auto";
                 timeout = setTimeout(onTimeout, 2000);
             }}
         >
@@ -113,9 +119,7 @@ export default function SlideDisplay({ slideshow, idx }: { slideshow: Slideshow;
                 length={slideshow.slides.length}
                 currentIdx={idx - 1}
                 getHref={(i) => `/slideshow/${slideshow.slug}/${i + 1}`}
-                getColorClass={(i) => (slideshow.slides[i].isSpecial ? "text-gray-50" : undefined)}
                 show={showOverlays}
-                surrounding={5}
             />
         </main>
     );
