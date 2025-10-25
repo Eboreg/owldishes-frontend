@@ -1,5 +1,5 @@
 import { fetchSlideshow } from "@/app/lib/data";
-import SlideDisplay from "@/app/ui/slide";
+import SlideDisplay from "@/app/ui/slide-display";
 import type { Metadata } from "next";
 
 type Props = {
