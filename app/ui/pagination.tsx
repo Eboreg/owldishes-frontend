@@ -47,6 +47,7 @@ export default function Pagination({
     const [forceShow, setForceShow] = useState<boolean>(false);
     const { mousePosition } = useMousePosition();
     const ref = useRef<HTMLDivElement>(null);
+    const indices = [...Array(length).keys()];
 
     useEffect(() => {
         const rect: Rect = {
@@ -84,6 +85,11 @@ export default function Pagination({
                     <ChevronLeftIcon className="w-6" />
                 </PaginationItem>
                 <div className="m-1 h-10 flex items-center justify-center text-lg">
+                    <select name="" id="" value={currentIdx} onChange={(e) => {}}>
+                        {indices.map((idx) => {
+                            return <option value={idx} key={idx}>{idx + 1}</option>
+                        })}
+                    </select>
                     {currentIdx + 1} / {length}
                 </div>
                 <PaginationItem href={getHref(currentIdx + 1)} disabled={currentIdx == length - 1}>
